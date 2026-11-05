@@ -1,0 +1,18 @@
+// Offline transport regression: no real key and no outbound provider request.
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),Module=require('node:module'),ts=require('typescript');
+require.extensions['.ts']=(mod,file)=>mod._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText,file);
+const {makeDraft}=require('../app/lab-catalog.ts');
+const env={};const records=new Map();let currentId='',providerCalls=0,claimCalls=0,mode='success';
+const db={async run(){claimCalls++;records.set(currentId,{id:currentId,versionId:'v_test',kind:'api',platform:'OpenAI',model:'gpt-6-luna',status:'running',evaluation:{verdict:'未评价',reason:''},createdAt:new Date().toISOString()});return {meta:{changes:1}}},update(){return {set(values){return {async where(){const old=records.get(currentId);records.set(currentId,{...old,status:values.status,...JSON.parse(values.data)})}}}}}};
+const originalLoad=Module._load;
+Module._load=function(name,parent,isMain){if(name==='cloudflare:workers')return {env};if(parent?.filename.endsWith('/app/api/lab/runs/route.ts')&&name==='../../../../db')return {getDb:()=>db};if(parent?.filename.endsWith('/app/api/lab/runs/route.ts')&&name==='../../../lab-server')return {writeGuard:()=>null,jsonBody:req=>req.json(),getVersion:async()=>makeDraft(),getRun:async id=>records.get(id)||null};return originalLoad.call(this,name,parent,isMain)};
+global.fetch=async(url,opts)=>{providerCalls++;assert.equal(url,'https://api.openai.com/v1/responses');assert(opts.headers.Authorization.startsWith('Bearer sk-'));const wire=JSON.parse(opts.body);assert(!('apiKey' in wire));assert.equal(wire.store,false);if(mode==='timeout')throw Error('simulated interrupted connection');return Response.json({id:'resp_offline_test',status:'completed',output:[{type:'message',content:[{type:'output_text',text:'{"test":"offline answer"}'}]}],usage:{input_tokens:10,output_tokens:5}})};
+const {POST}=require('../app/api/lab/runs/route.ts');
+const call=async(id,apiKey,url='https://lab.example/api/lab/runs')=>{currentId=id;return POST(new Request(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'api',requestId:id,versionId:'v_test',apiKey})}))};
+(async()=>{let r=await call('no-key-0001','');assert.equal(r.status,503);assert.equal(providerCalls,0);assert.equal(claimCalls,0);
+r=await call('http-key-001','sk-abcdefghijklmnopqrst','http://lab.example/api/lab/runs');assert.equal(r.status,400);assert.equal(providerCalls,0);
+r=await call('one-call-001','sk-abcdefghijklmnopqrst');assert.equal(r.status,200);let saved=await r.json();assert.equal(saved.status,'completed');assert.equal(saved.usage.output_tokens,5);assert.equal(providerCalls,1);assert(!JSON.stringify([...records.values()]).includes('sk-abcdefghijklmnopqrst'));assert(!JSON.stringify(saved).includes('sk-abcdefghijklmnopqrst'));
+await call('one-call-001','sk-abcdefghijklmnopqrst');assert.equal(providerCalls,1,'same attempt must not call provider twice');
+mode='timeout';r=await call('timeout-0001','sk-abcdefghijklmnopqrst');saved=await r.json();assert.equal(saved.status,'unknown');assert.equal(providerCalls,2);await call('timeout-0001','sk-abcdefghijklmnopqrst');assert.equal(providerCalls,2,'unknown attempt must not retry silently');
+console.log('PASS: missing-key and HTTP rejection; one provider call per attempt; durable mocked response/usage; unknown timeout preserved; credential excluded from request body and persisted result.');})().catch(e=>{console.error(e);process.exitCode=1});

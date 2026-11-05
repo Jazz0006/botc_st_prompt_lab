@@ -1,0 +1,4 @@
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+export const workspace = sqliteTable('workspace', { id: text('id').primaryKey(), revision: integer('revision').notNull().default(0), data: text('data').notNull(), updatedAt: text('updated_at').notNull() });
+export const labVersions=sqliteTable('lab_versions',{id:text('id').primaryKey(),title:text('title').notNull(),templateId:text('template_id').notNull(),baseline:text('baseline').notNull(),data:text('data').notNull(),createdAt:text('created_at').notNull()});
+export const labRuns=sqliteTable('lab_runs',{id:text('id').primaryKey(),versionId:text('version_id').notNull(),kind:text('kind').notNull(),platform:text('platform').notNull(),model:text('model').notNull(),status:text('status').notNull(),data:text('data').notNull(),evaluation:text('evaluation').notNull(),createdAt:text('created_at').notNull()});

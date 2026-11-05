@@ -1,0 +1,14 @@
+import { z } from 'zod';
+export const statusSchema=z.enum(['保留','排除','待讨论']);
+const short=z.string().max(200), long=z.string().max(12000);
+export const stepSchema=z.object({id:short,night:short,actor:short,action:long,speech:long,strategy:long,note:long});
+export const planSchema=z.object({id:short,title:short,status:statusSchema,info:long,space:long,risk:long,reason:long,assumption:long,steps:z.array(stepSchema).max(100)});
+export const templateSchema=z.object({id:short,title:short,script:z.enum(['暗流涌动','暗月初升']),players:z.number().int().min(5).max(20),roster:long,tags:z.array(short).max(12),featured:z.boolean(),source:long,plans:z.array(planSchema).max(30)});
+export const coreSchema=z.object({templates:z.array(templateSchema).max(100),criteria:z.array(z.object({id:short,title:short,detail:long})).max(40),questions:z.array(z.object({id:short,text:long,resolved:z.boolean()})).max(200)});
+export const dataSchema=coreSchema.extend({history:z.array(z.object({id:short,at:short,label:short,snapshot:coreSchema})).max(50)});
+export type Step=z.infer<typeof stepSchema>;
+export type Plan=z.infer<typeof planSchema>;
+export type Template=z.infer<typeof templateSchema>;
+export type Core=z.infer<typeof coreSchema>;
+export type Data=z.infer<typeof dataSchema>;
+export const uid=()=>globalThis.crypto?.randomUUID?.() || 'note-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);

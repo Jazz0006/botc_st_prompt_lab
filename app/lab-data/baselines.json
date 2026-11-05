@@ -1,0 +1,854 @@
+{
+  "sourceSha": "bc11573236866be8f649d6b26d660603fd328c79",
+  "importedAt": "2026-11-05",
+  "repository": "Jazz0006/CampBoardGameHost",
+  "opening": {
+    "instructions": "你是一位资深的 Blood on the Clocktower（Trouble Brewing）真人说书人，将协助主持 Host 提供的这局游戏。\n目标是让双方在符合其经验水平的公平、可推理的局面中，通过交流、判断与欺骗影响胜负。\n请在内部完成以下整局分析，不必逐步展示：\n1. 梳理全部信息位：区分说书人掌握的真实事实、玩家已经知道的事实、目前合法可决定的信息，\n   以及取决于未来玩家行动的信息；辨认各信息位可能提供的合法结果和彼此关系。\n2. 从善良玩家视角推演：结合每人的经验，估计可能的身份公开、信息交换与交叉验证，\n   判断哪些组合会过早锁定邪恶玩家，尤其令新手邪恶玩家失去实际辩护空间。\n3. 评估合法的平衡手段：联合考量本局可选择的 Drunk 及其信息、实际存在的 Recluse/Spy\n   登记歧义、Red Herring 和其他合法信息选择。登记歧义只是可能性，具体登记由 Host 决定；\n   保留善良玩家能够追踪、质疑并最终破解的推理路径。\n4. 从邪恶玩家视角推演：结合其经验，设想他们能否实际使用三个 Demon bluffs，\n   如何与场上角色和线索配合，怎样建立并维持可信的虚假世界；优先照顾不善编造故事的新手，\n   避免仅在理论上精巧、实际难以扮演的方案。\n5. 在双方视角下联合选择唯一最合适的首夜整体配置，包括酒鬼人选及相应信息、\n   其他首夜线索、Red Herring 和 Demon bluffs；既不让信息过早交叉锁死，\n   也不因掩护邪恶而剥夺善良玩家的有效信息。state.hasDrunk 为 true 时选择合法镇民作酒鬼，\n   为 false 时 drunkSeat=null；真实阵容保持不变。\n6. 预想多夜信息轨迹、身份声明与局势变化，形成可延续的整局战略；\n   后续用 Host 新确认的事实与已有 strategyMemory 重新评估尚未执行的决定，\n   已公布的信息保留其历史一致性。未来行动和公开声明属于假设，不视为已发生。\n只输出一套完整可执行的推荐。strategyMemory 保留最关键的交互张力、条件性跨夜意图及未知因素；\ntradeoffSummary 简要交代主要取舍，不复述角色规则或详细分析过程。\n\n输出接口（严格遵守 Host 提供的合同；这不是逐角色规划任务）：\n原样复制 requestIdentity、asOfRevision；schemaVersion=2。根据 state.seats 的展示阵容、\n有无 Drunk 和 decisionInventory 中本轮实际的首夜信息项/待确认事件，自行联合选择酒鬼与首夜方案。\ninformation 必须完整覆盖 decisionInventory.information，逐项使用相同的 decisionId、\nsourceSeat、abilityRoleId。选定的酒鬼 effectiveAbilityRoleId=null，其他角色按展示身份；\nresolution、basis、waitingForEvents 必须符合已知状态与尚未确认的真实玩家行动。\n当前能够推荐的信息用 DECISION 与具体观察值，即使按规则只有一个答案也应给出具体值；\nHost 不会替模型计算或补齐信息。依赖未发生行动的信息用 DEFERRED / STATUS_DEPENDENT、\nNONE 观察及真实 waitingForEvents，不猜测未来目标或结果。\ndeferredActions 必须只对应 decisionInventory.events 中本局已知待确认事件，\ndecisionId、event、actorSeat 与实际身份一致；不得编造事件。\nHost 只检查响应结构、座位/角色引用、请求身份和版本；推荐不会自动成为已确认事实。\n需要 Red Herring 时，选择实际善良阵营且真实身份不是 Recluse 的玩家；排除 Recluse 是当前 Host 的开局偏好。\n不要用 Spy/Recluse 的登记可能性替代实际阵营，也不要输出或推断未确认的登记事实。\ndemonBluffRoleIds 根据剧本角色目录选三个不同且未在场的善良身份，\n否则为 null。FIXED_NEIGHBORS 的 subject.seats 为空；EVIDENCE_PAIR 只填两个座位，\n配合 observation.kind=ROLE 与 roleId 表示该身份在二人之一；不另输出固定规则文案。\nNONE / PLAYER_QUERY_PENDING 不填目标；没有用到的 number、roleId、boolean 填 null。\nLibrarian 观察到没有外来者时使用 ZERO_OUTSIDERS。\nstrategyMemory 的 tensions、intentions、uncertainties 各最多 3 项；各字符串非空且不超过\n300 字，tradeoffSummary 不超过 1200 字。只返回符合 JSON Schema 的结构化结果。",
+    "responseSchema": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "integer"
+        },
+        "asOfRevision": {
+          "type": "integer"
+        },
+        "requestIdentity": {
+          "type": "object",
+          "properties": {
+            "gameId": {
+              "type": "string"
+            },
+            "gameStateRevision": {
+              "type": "integer"
+            },
+            "playerInputRevision": {
+              "type": "integer"
+            },
+            "rosterFingerprint": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "gameId",
+            "gameStateRevision",
+            "playerInputRevision",
+            "rosterFingerprint"
+          ],
+          "additionalProperties": false
+        },
+        "openingPlan": {
+          "type": "object",
+          "properties": {
+            "drunkSeat": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "redHerringSeat": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "demonBluffRoleIds": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "information": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "decisionId": {
+                    "type": "string"
+                  },
+                  "sourceSeat": {
+                    "type": "integer"
+                  },
+                  "abilityRoleId": {
+                    "type": "string"
+                  },
+                  "effectiveAbilityRoleId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "resolution": {
+                    "type": "string",
+                    "enum": [
+                      "DECISION",
+                      "HOST_DETERMINED",
+                      "CONDITIONAL_INTENT",
+                      "DEFERRED"
+                    ]
+                  },
+                  "basis": {
+                    "type": "string",
+                    "enum": [
+                      "FUNCTIONING",
+                      "DRUNK_MISINFORMATION",
+                      "STATUS_DEPENDENT",
+                      "RULE_DETERMINED"
+                    ]
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "enum": [
+                          "NONE",
+                          "EVIDENCE_PAIR",
+                          "FIXED_NEIGHBORS",
+                          "PLAYER_SELECTED_TARGETS",
+                          "PLAYER_QUERY_PENDING"
+                        ]
+                      },
+                      "seats": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seats"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "observation": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "enum": [
+                          "NONE",
+                          "NUMBER",
+                          "ROLE",
+                          "BOOLEAN",
+                          "ZERO_OUTSIDERS"
+                        ]
+                      },
+                      "number": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
+                      },
+                      "roleId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "boolean": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "number",
+                      "roleId",
+                      "boolean"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "waitingForEvents": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "decisionId",
+                  "sourceSeat",
+                  "abilityRoleId",
+                  "effectiveAbilityRoleId",
+                  "resolution",
+                  "basis",
+                  "subject",
+                  "observation",
+                  "waitingForEvents"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "deferredActions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "decisionId": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "actorSeat": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  }
+                },
+                "required": [
+                  "decisionId",
+                  "event",
+                  "actorSeat"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "drunkSeat",
+            "redHerringSeat",
+            "demonBluffRoleIds",
+            "information",
+            "deferredActions"
+          ],
+          "additionalProperties": false
+        },
+        "strategyMemory": {
+          "type": "object",
+          "properties": {
+            "tensions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,300}$"
+              },
+              "maxItems": 3
+            },
+            "intentions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "trigger": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,300}$"
+                  },
+                  "approach": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,300}$"
+                  },
+                  "risk": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,300}$"
+                  }
+                },
+                "required": [
+                  "trigger",
+                  "approach",
+                  "risk"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 3
+            },
+            "uncertainties": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,300}$"
+              },
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "tensions",
+            "intentions",
+            "uncertainties"
+          ],
+          "additionalProperties": false
+        },
+        "tradeoffSummary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "asOfRevision",
+        "requestIdentity",
+        "openingPlan",
+        "strategyMemory",
+        "tradeoffSummary"
+      ],
+      "additionalProperties": false
+    },
+    "path": "app/src/main/java/com/codex/campboardgamehost/clocktower/session/InitialJointOpeningDirectV2.kt"
+  },
+  "continuation": {
+    "instructions": "你是同一局血染钟楼的资深 AI 说书人，现在继续先前整局、多夜的战略，而不是重新从零挑一条线索。\n首先阅读最新实际/展示角色、状态、玩家水平、已记录声明及 gameLogDelta 精简游戏记录。连续会话中它是自上次接受回复后的新增事实；当没有保留的上次会话时，它包含本局全部精简记录以避免遗漏。\n历史覆盖是局部的：没有记录的行动、声明、登记或观测必须视为未知。声明不等于事实。\ngameLogDelta 按夜/天标记，仅包含有意义的正式动作及实际玩家获得的信息；酒鬼选定来自 Host 最终确认的角色而不是 AI 推荐。玩家公开声明仅是玩家发言，不代表真实身份。没有出现的内部阶段、清毒延续或重复死亡记录不是新的线索。不要从缺失记录推断未发生的行动，也不能把登记歧义升级成唯一真实登记。\npriorStrategyMemory 仅为以前的可错战略假说，优先相信已确认 Host 事实。\n从跨角色关系、善恶压力、可推理的多个世界、各夜可能的发展与玩家水平看整局；适用于所有角色。\n逐一对 priorStrategyMemory.intentions 作 KEEP / REVISE / RETIRE，并简述真实的变化理由。\n目标是继续形成多夜合理可解释的线索轨迹，不预言或承诺未来信息重复同一个数字/真假。\n事件类型和角色描述当前问题；AI 不得创建独立的投毒者、酒鬼、占卜师或其他角色推荐器。\n从整局战略评估当前唯一待裁量的决定，直接返回一条语义结果，不生成未来决定或整包线索。\n输入 currentDecision 仅描述当前问题及其实际状态。不要索要、猜测或输出 Host 的候选 ID；也不要虚构未发生的玩家行动。\ncurrentResult.decisionId 必须等于 currentDecision.decisionId；semantic 直接填写当前一条数字、真假、配对、座位或登记语义。Host 收到后验证结构、身份与版本。\nHost 决定哪些行动已真正发生；未来尚不可决定的项目不属于本次可采纳包，仍以条件战略记忆表达。\n不能修改既有玩家收到的线索，也不能假造未登记的意图，不能自行断定含糊的间谍/隐士登记。\n如果说书人改变了选择，只能根据被记录的决定推断其后果，不得把未明说的人类动机当成事实。\nupdatedStrategyMemory 是下一次继续使用的短小、可修订战略摘要，不能冒充 Host 事实。\n其中 tensions、intentions、uncertainties 各最多 3 项；每段字符串非空且最多 300 字。\nstrategicDirection 用简洁中文说明为什么推荐当前 currentResult、依据哪些已确认事实及主要取舍；区分事实与假设，不复述规则或逐步分析过程。非空且最多 600 字。\nsemantic.kind 为 SCALAR_RESULT / PAIR_RESULT / SEAT_TARGET / REGISTRATION_CHOICE 之一。对应填写 scalarValue（数字或真假用字符串）、pairRoleId 与两个 pairSeats（无该类角色时 pairRoleId 为 null、pairSeats 为 []）、seat、或 registrationStatus 与 registrationRoleId；其他可空字段填 null、无关 pairSeats 为 []。只返回严格 JSON，不输出候选 ID、未来线索或执行命令。",
+    "responseSchema": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "integer"
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "gameId": {
+              "type": "string"
+            },
+            "gameStateRevision": {
+              "type": "integer"
+            },
+            "playerInputRevision": {
+              "type": "integer"
+            },
+            "exclusiveGlobalSequence": {
+              "type": "integer"
+            },
+            "memoryVersion": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "gameId",
+            "gameStateRevision",
+            "playerInputRevision",
+            "exclusiveGlobalSequence",
+            "memoryVersion"
+          ],
+          "additionalProperties": false
+        },
+        "revisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "priorIndex": {
+                "type": "integer"
+              },
+              "verdict": {
+                "type": "string",
+                "enum": [
+                  "KEEP",
+                  "REVISE",
+                  "RETIRE"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "priorIndex",
+              "verdict",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "affectedOpenDecisionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "currentResult": {
+          "type": "object",
+          "properties": {
+            "decisionId": {
+              "type": "string"
+            },
+            "semantic": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "SCALAR_RESULT",
+                    "PAIR_RESULT",
+                    "SEAT_TARGET",
+                    "REGISTRATION_CHOICE"
+                  ]
+                },
+                "scalarValue": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "pairRoleId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "pairSeats": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                "seat": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "registrationStatus": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "registrationRoleId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "kind",
+                "scalarValue",
+                "pairRoleId",
+                "pairSeats",
+                "seat",
+                "registrationStatus",
+                "registrationRoleId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "decisionId",
+            "semantic"
+          ],
+          "additionalProperties": false
+        },
+        "updatedStrategyMemory": {
+          "type": "object",
+          "properties": {
+            "tensions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,300}$"
+              },
+              "maxItems": 3
+            },
+            "intentions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "trigger": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,300}$"
+                  },
+                  "approach": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,300}$"
+                  },
+                  "risk": {
+                    "type": "string",
+                    "pattern": "^[\\s\\S]{1,300}$"
+                  }
+                },
+                "required": [
+                  "trigger",
+                  "approach",
+                  "risk"
+                ],
+                "additionalProperties": false
+              },
+              "maxItems": 3
+            },
+            "uncertainties": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[\\s\\S]{1,300}$"
+              },
+              "maxItems": 3
+            }
+          },
+          "required": [
+            "tensions",
+            "intentions",
+            "uncertainties"
+          ],
+          "additionalProperties": false
+        },
+        "strategicDirection": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "source",
+        "revisions",
+        "affectedOpenDecisionIds",
+        "currentResult",
+        "updatedStrategyMemory",
+        "strategicDirection"
+      ],
+      "additionalProperties": false
+    },
+    "path": "app/src/main/java/com/codex/campboardgamehost/clocktower/session/StorytellerStrategicContinuationV2.kt"
+  },
+  "experiment": {
+    "instructions": "你是一位资深的 Blood on the Clocktower（Trouble Brewing）真人说书人，将协助主持 Host 提供的这局游戏。\n目标是让双方在符合其经验水平的公平、可推理的局面中，通过交流、判断与欺骗影响胜负。\n请在内部完成以下整局分析，不必逐步展示：\n1. 梳理全部信息位：区分说书人掌握的真实事实、玩家已经知道的事实、目前合法可决定的信息，\n   以及取决于未来玩家行动的信息；辨认各信息位可能提供的合法结果和彼此关系。\n2. 从善良玩家视角推演：结合每人的经验，估计可能的身份公开、信息交换与交叉验证，\n   判断哪些组合会过早锁定邪恶玩家，尤其令新手邪恶玩家失去实际辩护空间。\n3. 评估合法的平衡手段：联合考量本局可选择的 Drunk 及其信息、实际存在的 Recluse/Spy\n   登记歧义、Red Herring 和其他合法信息选择。登记歧义只是可能性，具体登记由 Host 决定；\n   保留善良玩家能够追踪、质疑并最终破解的推理路径。\n4. 从邪恶玩家视角推演：结合其经验，设想他们能否实际使用三个 Demon bluffs，\n   如何与场上角色和线索配合，怎样建立并维持可信的虚假世界；优先照顾不善编造故事的新手，\n   避免仅在理论上精巧、实际难以扮演的方案。\n5. 在双方视角下提出三套各自合理的首夜整体配置，包括酒鬼人选及相应信息、\n   其他首夜线索、Red Herring 和 Demon bluffs；既不让信息过早交叉锁死，\n   也不因掩护邪恶而剥夺善良玩家的有效信息。state.hasDrunk 为 true 时选择合法镇民作酒鬼，\n   为 false 时 drunkSeat=null；真实阵容保持不变。\n6. 预想多夜信息轨迹、身份声明与局势变化，形成可延续的整局战略；\n   后续用 Host 新确认的事实与已有 strategyMemory 重新评估尚未执行的决定，\n   已公布的信息保留其历史一致性。未来行动和公开声明属于假设，不视为已发生。\n输出三套独立完整可执行的候选，不强行排序或选唯一最优。strategyMemory 保留最关键的交互张力、条件性跨夜意图及未知因素；\ntradeoffSummary 简要交代主要取舍，不复述角色规则或详细分析过程。\n\n输出接口（严格遵守 Host 提供的合同；这不是逐角色规划任务）：\n原样复制 requestIdentity、asOfRevision；schemaVersion=2。根据 state.seats 的展示阵容、\n有无 Drunk 和 decisionInventory 中本轮实际的首夜信息项/待确认事件，自行联合选择酒鬼与首夜方案。\ninformation 必须完整覆盖 decisionInventory.information，逐项使用相同的 decisionId、\nsourceSeat、abilityRoleId。选定的酒鬼 effectiveAbilityRoleId=null，其他角色按展示身份；\nresolution、basis、waitingForEvents 必须符合已知状态与尚未确认的真实玩家行动。\n当前能够推荐的信息用 DECISION 与具体观察值，即使按规则只有一个答案也应给出具体值；\nHost 不会替模型计算或补齐信息。依赖未发生行动的信息用 DEFERRED / STATUS_DEPENDENT、\nNONE 观察及真实 waitingForEvents，不猜测未来目标或结果。\ndeferredActions 必须只对应 decisionInventory.events 中本局已知待确认事件，\ndecisionId、event、actorSeat 与实际身份一致；不得编造事件。\nHost 只检查响应结构、座位/角色引用、请求身份和版本；推荐不会自动成为已确认事实。\n需要 Red Herring 时，选择实际善良阵营且真实身份不是 Recluse 的玩家；排除 Recluse 是当前 Host 的开局偏好。\n不要用 Spy/Recluse 的登记可能性替代实际阵营，也不要输出或推断未确认的登记事实。\ndemonBluffRoleIds 根据剧本角色目录选三个不同且未在场的善良身份，\n否则为 null。FIXED_NEIGHBORS 的 subject.seats 为空；EVIDENCE_PAIR 只填两个座位，\n配合 observation.kind=ROLE 与 roleId 表示该身份在二人之一；不另输出固定规则文案。\nNONE / PLAYER_QUERY_PENDING 不填目标；没有用到的 number、roleId、boolean 填 null。\nLibrarian 观察到没有外来者时使用 ZERO_OUTSIDERS。\nstrategyMemory 的 tensions、intentions、uncertainties 各最多 3 项；各字符串非空且不超过\n300 字，tradeoffSummary 不超过 1200 字。只返回符合 JSON Schema 的结构化结果。\n\n研习所实验扩展：最外层使用 plans 数组，恰好三项。每项 plan 按上述 APP 单套合同填写；assessment 独立说明保留、排除或待讨论的建议、具体理由、邪恶方可使用的替代世界与不确定条件。schemaVersion=2 与 requestIdentity 等要求适用于每项 plan。模型的建议供人工复核，不是最终标签。",
+    "responseSchema": {
+      "type": "object",
+      "properties": {
+        "plans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "plan": {
+                "type": "object",
+                "properties": {
+                  "schemaVersion": {
+                    "type": "integer"
+                  },
+                  "asOfRevision": {
+                    "type": "integer"
+                  },
+                  "requestIdentity": {
+                    "type": "object",
+                    "properties": {
+                      "gameId": {
+                        "type": "string"
+                      },
+                      "gameStateRevision": {
+                        "type": "integer"
+                      },
+                      "playerInputRevision": {
+                        "type": "integer"
+                      },
+                      "rosterFingerprint": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "gameId",
+                      "gameStateRevision",
+                      "playerInputRevision",
+                      "rosterFingerprint"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "openingPlan": {
+                    "type": "object",
+                    "properties": {
+                      "drunkSeat": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
+                      },
+                      "redHerringSeat": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
+                      },
+                      "demonBluffRoleIds": {
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "information": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "decisionId": {
+                              "type": "string"
+                            },
+                            "sourceSeat": {
+                              "type": "integer"
+                            },
+                            "abilityRoleId": {
+                              "type": "string"
+                            },
+                            "effectiveAbilityRoleId": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "resolution": {
+                              "type": "string",
+                              "enum": [
+                                "DECISION",
+                                "HOST_DETERMINED",
+                                "CONDITIONAL_INTENT",
+                                "DEFERRED"
+                              ]
+                            },
+                            "basis": {
+                              "type": "string",
+                              "enum": [
+                                "FUNCTIONING",
+                                "DRUNK_MISINFORMATION",
+                                "STATUS_DEPENDENT",
+                                "RULE_DETERMINED"
+                              ]
+                            },
+                            "subject": {
+                              "type": "object",
+                              "properties": {
+                                "mode": {
+                                  "type": "string",
+                                  "enum": [
+                                    "NONE",
+                                    "EVIDENCE_PAIR",
+                                    "FIXED_NEIGHBORS",
+                                    "PLAYER_SELECTED_TARGETS",
+                                    "PLAYER_QUERY_PENDING"
+                                  ]
+                                },
+                                "seats": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "mode",
+                                "seats"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "observation": {
+                              "type": "object",
+                              "properties": {
+                                "kind": {
+                                  "type": "string",
+                                  "enum": [
+                                    "NONE",
+                                    "NUMBER",
+                                    "ROLE",
+                                    "BOOLEAN",
+                                    "ZERO_OUTSIDERS"
+                                  ]
+                                },
+                                "number": {
+                                  "type": [
+                                    "integer",
+                                    "null"
+                                  ]
+                                },
+                                "roleId": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                },
+                                "boolean": {
+                                  "type": [
+                                    "boolean",
+                                    "null"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "number",
+                                "roleId",
+                                "boolean"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "waitingForEvents": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "required": [
+                            "decisionId",
+                            "sourceSeat",
+                            "abilityRoleId",
+                            "effectiveAbilityRoleId",
+                            "resolution",
+                            "basis",
+                            "subject",
+                            "observation",
+                            "waitingForEvents"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "deferredActions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "decisionId": {
+                              "type": "string"
+                            },
+                            "event": {
+                              "type": "string"
+                            },
+                            "actorSeat": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "decisionId",
+                            "event",
+                            "actorSeat"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "drunkSeat",
+                      "redHerringSeat",
+                      "demonBluffRoleIds",
+                      "information",
+                      "deferredActions"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "strategyMemory": {
+                    "type": "object",
+                    "properties": {
+                      "tensions": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[\\s\\S]{1,300}$"
+                        },
+                        "maxItems": 3
+                      },
+                      "intentions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "trigger": {
+                              "type": "string",
+                              "pattern": "^[\\s\\S]{1,300}$"
+                            },
+                            "approach": {
+                              "type": "string",
+                              "pattern": "^[\\s\\S]{1,300}$"
+                            },
+                            "risk": {
+                              "type": "string",
+                              "pattern": "^[\\s\\S]{1,300}$"
+                            }
+                          },
+                          "required": [
+                            "trigger",
+                            "approach",
+                            "risk"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "maxItems": 3
+                      },
+                      "uncertainties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[\\s\\S]{1,300}$"
+                        },
+                        "maxItems": 3
+                      }
+                    },
+                    "required": [
+                      "tensions",
+                      "intentions",
+                      "uncertainties"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tradeoffSummary": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schemaVersion",
+                  "asOfRevision",
+                  "requestIdentity",
+                  "openingPlan",
+                  "strategyMemory",
+                  "tradeoffSummary"
+                ],
+                "additionalProperties": false
+              },
+              "assessment": {
+                "type": "object",
+                "properties": {
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "保留",
+                      "排除",
+                      "待讨论"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "alternativeWorld": {
+                    "type": "string"
+                  },
+                  "uncertainties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "verdict",
+                  "reason",
+                  "alternativeWorld",
+                  "uncertainties"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "plan",
+              "assessment"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "plans"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
