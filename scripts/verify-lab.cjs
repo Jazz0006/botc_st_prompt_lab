@@ -15,3 +15,22 @@ assert(!draftSchema.safeParse({...d,config:{...d.config,dailyRequests:21}}).succ
 assert(!externalSchema.safeParse({requestId:'12345678',versionId:'v_test',platform:'',model:'x',answer:'x',evaluation:{verdict:'保留',reason:'x'}}).success);
 assert(baselines.opening.instructions.includes('只输出一套'));assert(!baselines.experiment.instructions.includes('唯一最合适'));assert.equal(baselines.experiment.responseSchema.properties.plans.minItems,3);
 console.log('PASS: 480 distinct templates; player counts and Drunk semantics; complete portable prompt; frozen text independence; strict format validation; request caps; external answer validation; preserved APP baseline.');
+const {defaultSeats,readOpeningSeats,swapSeats,tablePositions}=require('../app/lab-catalog.ts');
+for(const p of catalog){
+ const original=defaultSeats(p);original[0].experience='EXPERT';original[0].researchNote='moves with player';
+ const before=JSON.stringify(original);const swapped=swapSeats(original,0,original.length-1);
+ assert.equal(JSON.stringify(original),before);assert.equal(swapped.at(-1).experience,'EXPERT');assert.equal(swapped.at(-1).researchNote,'moves with player');
+ assert.deepEqual(swapped.map(s=>s.seat),Array.from({length:p.player_count},(_,i)=>i+1));
+ const state=JSON.parse(makeState(p,swapped));assert.deepEqual(readOpeningSeats(JSON.stringify(state),p),swapped);
+ assert.notEqual(state.requestIdentity.rosterFingerprint,JSON.parse(makeState(p,original)).requestIdentity.rosterFingerprint);
+ for(const info of state.decisionInventory.information){assert.equal(info.shownRoleId,state.state.seats[info.sourceSeat-1].shownRoleId);assert.equal(info.decisionId,'first-night:seat-'+info.sourceSeat)}
+ for(const seat of state.state.seats.filter(s=>s.shownRoleId==='fortuneteller'))assert(state.decisionInventory.events.some(e=>e.event==='fortune_teller.targets:seat-'+seat.seat));
+ assert.deepEqual(swapSeats(swapped,0,original.length-1),original);
+}
+for(let n=5;n<=15;n++){
+ const {size,positions}=tablePositions(n);assert.equal(positions.length,n);assert.equal(new Set(positions.map(p=>p.row+','+p.col)).size,n);
+ assert(positions.every(p=>p.row===1||p.col===size||p.row===size||p.col===1));
+}
+assert.equal(readOpeningSeats('任意手动文本',catalog[0]),null);
+assert.throws(()=>makeState(catalog[0],[]));
+console.log('PASS: 480 rearranged requests preserve player properties, rebuild seat references and fingerprints; swap is reversible; 5–15-player tables have unique perimeter seats; custom text is not silently parsed.');
