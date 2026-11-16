@@ -96,6 +96,6 @@ APP基线来自 `Jazz0006/CampBoardGameHost` 的 `bc11573236866be8f649d6b26d6606
 
 - 入口 `worker/cloudflare.ts` 用 `worker/cloudflare-access.ts` 包住原应用：每个请求必须带有效的 Access 签名令牌（团队域名与 AUD 均匹配），否则拒绝；未配置 Access 时全部拒绝。Sites 构建仍使用 `worker/index.ts`，不受影响。
 - 非密钥设置在 `deploy/cloudflare.json`（Worker 名称、D1 数据库、Access 团队域名与 AUD）。
-- `node scripts/deploy-cloudflare.mjs migrate deploy`：以 `PROMPT_LAB_TARGET=cloudflare` 构建，按 `drizzle/` 应用远程 D1 迁移（已应用的不会重复），然后部署。需要环境变量 `CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`。
-- GitHub Actions `Deploy to Cloudflare` 执行同样步骤，需要仓库密钥 `CLOUDFLARE_API_TOKEN`。
+- `node scripts/deploy-cloudflare.mjs migrate deploy`：以 `PROMPT_LAB_TARGET=cloudflare` 构建，按 `drizzle/` 应用远程 D1 迁移（已应用的不会重复），然后部署。需要环境变量 `CLOUDFLARE_ACCOUNT_ID`；在自己电脑上先 `pnpm exec wrangler login`，CI 中改用 `CLOUDFLARE_API_TOKEN`。
+- GitHub Actions `Deploy to Cloudflare`（仅手动触发）执行同样步骤，需要仓库密钥 `CLOUDFLARE_API_TOKEN`。
 - 自建站点的数据库从空开始；Sites 站点上的记录需用站内备份／导出另行迁移。

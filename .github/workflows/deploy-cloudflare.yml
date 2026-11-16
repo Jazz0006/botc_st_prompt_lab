@@ -2,10 +2,9 @@ name: Deploy to Cloudflare
 
 # Self-hosted Cloudflare copy of the Prompt Lab, behind Cloudflare Access.
 # The OpenAI Sites site is deployed separately and is not affected.
+# Manual only; needs the CLOUDFLARE_API_TOKEN repository secret.
 on:
   workflow_dispatch:
-  push:
-    branches: [main, claude/cloudflare-deploy]
 
 permissions:
   contents: read

@@ -6,7 +6,8 @@
 //   node scripts/deploy-cloudflare.mjs deploy           # build the Access-gated entry and deploy the Worker
 //   node scripts/deploy-cloudflare.mjs migrate deploy   # both, one build
 //
-// Needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the environment.
+// Needs CLOUDFLARE_ACCOUNT_ID. Sign in with `pnpm exec wrangler login` on your own
+// computer, or set CLOUDFLARE_API_TOKEN (CI).
 // Settings (non-secret) live in deploy/cloudflare.json.
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -16,13 +17,15 @@ if (!commands.length || commands.some((c) => !["migrate", "deploy"].includes(c))
   console.error("Usage: node scripts/deploy-cloudflare.mjs <migrate|deploy> [deploy]");
   process.exit(64);
 }
-for (const name of ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]) {
-  if (!process.env[name]) { console.error(`${name} is required.`); process.exit(64); }
+if (!process.env.CLOUDFLARE_ACCOUNT_ID) {
+  console.error("CLOUDFLARE_ACCOUNT_ID is required.");
+  process.exit(64);
 }
 
 const settings = JSON.parse(readFileSync("deploy/cloudflare.json", "utf8"));
 const run = (cmd, args, env = {}) => {
-  const r = spawnSync(cmd, args, { stdio: "inherit", env: { ...process.env, ...env } });
+  // Windows resolves pnpm only through the shell (pnpm.cmd).
+  const r = spawnSync(cmd, args, { stdio: "inherit", env: { ...process.env, ...env }, shell: process.platform === "win32" });
   if (r.status !== 0) process.exit(r.status ?? 1);
 };
 
