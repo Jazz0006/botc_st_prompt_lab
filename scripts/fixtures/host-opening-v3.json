@@ -1,0 +1,1089 @@
+{
+ "sourceSha": "73539ccba027d6060f0e8b03ac5eb6af0f1321de",
+ "cases": [
+  {
+   "shown": [
+    "poisoner",
+    "ravenkeeper",
+    "saint",
+    "slayer",
+    "empath",
+    "fortuneteller",
+    "mayor",
+    "imp"
+   ],
+   "expected": {
+    "slots": [
+     {
+      "slot": "redHerring",
+      "seats": [
+       2,
+       3,
+       4,
+       5,
+       6,
+       7
+      ]
+     },
+     {
+      "roles": [
+       "washerwoman",
+       "librarian",
+       "investigator",
+       "chef",
+       "soldier",
+       "butler",
+       "drunk",
+       "recluse",
+       "undertaker",
+       "monk",
+       "virgin"
+      ],
+      "slot": "demonBluffs"
+     }
+    ],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 5,
+      "role": "empath",
+      "answer": "NEVER",
+      "truthful": [
+       0
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 6,
+      "role": "fortuneteller",
+      "answer": "NEVER",
+      "type": "AFTER_PLAYER_CHOICE"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "poisoner",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "ravenkeeper",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "saint",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "slayer",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "empath",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 6,
+      "role": "fortuneteller",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 7,
+      "role": "mayor",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 8,
+      "role": "imp",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": false
+  },
+  {
+   "shown": [
+    "chef",
+    "fortuneteller",
+    "ravenkeeper",
+    "butler",
+    "investigator",
+    "recluse",
+    "baron",
+    "imp"
+   ],
+   "expected": {
+    "slots": [
+     {
+      "slot": "drunk",
+      "seats": [
+       1,
+       2,
+       3,
+       5
+      ]
+     },
+     {
+      "slot": "redHerring",
+      "seats": [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     },
+     {
+      "roles": [
+       "washerwoman",
+       "librarian",
+       "empath",
+       "soldier",
+       "mayor",
+       "saint",
+       "undertaker",
+       "monk",
+       "virgin",
+       "slayer"
+      ],
+      "slot": "demonBluffs"
+     }
+    ],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 1,
+      "role": "chef",
+      "answer": "ALWAYS",
+      "ifDrunk": [
+       0,
+       1,
+       2
+      ],
+      "truthful": [
+       1,
+       2
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 2,
+      "role": "fortuneteller",
+      "answer": "NEVER",
+      "type": "AFTER_PLAYER_CHOICE"
+     },
+     {
+      "seat": 5,
+      "role": "investigator",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 7,
+        "role": "baron"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 6,
+        "roles": [
+         "poisoner",
+         "spy",
+         "scarletwoman",
+         "baron"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "chef",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "fortuneteller",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "ravenkeeper",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "butler",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "investigator",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 6,
+      "role": "recluse",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 7,
+      "role": "baron",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 8,
+      "role": "imp",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": true
+  },
+  {
+   "shown": [
+    "washerwoman",
+    "librarian",
+    "chef",
+    "empath",
+    "monk",
+    "spy",
+    "imp"
+   ],
+   "expected": {
+    "slots": [
+     {
+      "roles": [
+       "investigator",
+       "fortuneteller",
+       "ravenkeeper",
+       "soldier",
+       "mayor",
+       "butler",
+       "drunk",
+       "recluse",
+       "saint",
+       "undertaker",
+       "virgin",
+       "slayer"
+      ],
+      "slot": "demonBluffs"
+     }
+    ],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 1,
+      "role": "washerwoman",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 2,
+        "role": "librarian"
+       },
+       {
+        "seat": 3,
+        "role": "chef"
+       },
+       {
+        "seat": 4,
+        "role": "empath"
+       },
+       {
+        "seat": 5,
+        "role": "monk"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 6,
+        "roles": [
+         "washerwoman",
+         "librarian",
+         "chef",
+         "empath",
+         "monk"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 2,
+      "role": "librarian",
+      "answer": "ALWAYS",
+      "noneTruthful": true,
+      "truthful": [],
+      "mayRegister": [
+       {
+        "seat": 6,
+        "roles": [
+         "butler",
+         "drunk",
+         "recluse",
+         "saint"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 3,
+      "role": "chef",
+      "answer": "ALWAYS",
+      "truthful": [
+       0,
+       1
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 4,
+      "role": "empath",
+      "answer": "NEVER",
+      "truthful": [
+       0
+      ],
+      "type": "NUMBER"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "washerwoman",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "librarian",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "chef",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "empath",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "monk",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 6,
+      "role": "spy",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 7,
+      "role": "imp",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": false
+  },
+  {
+   "shown": [
+    "washerwoman",
+    "investigator",
+    "empath",
+    "poisoner",
+    "imp"
+   ],
+   "expected": {
+    "slots": [],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 1,
+      "role": "washerwoman",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 2,
+        "role": "investigator"
+       },
+       {
+        "seat": 3,
+        "role": "empath"
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 2,
+      "role": "investigator",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 4,
+        "role": "poisoner"
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 3,
+      "role": "empath",
+      "answer": "NEVER",
+      "truthful": [
+       1
+      ],
+      "type": "NUMBER"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "washerwoman",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "investigator",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "empath",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "poisoner",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "imp",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": false
+  },
+  {
+   "shown": [
+    "washerwoman",
+    "librarian",
+    "investigator",
+    "chef",
+    "empath",
+    "fortuneteller",
+    "undertaker",
+    "monk",
+    "recluse",
+    "spy",
+    "poisoner",
+    "scarletwoman",
+    "imp"
+   ],
+   "expected": {
+    "slots": [
+     {
+      "slot": "drunk",
+      "seats": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8
+      ]
+     },
+     {
+      "slot": "redHerring",
+      "seats": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8
+      ]
+     },
+     {
+      "roles": [
+       "ravenkeeper",
+       "soldier",
+       "mayor",
+       "butler",
+       "saint",
+       "virgin",
+       "slayer"
+      ],
+      "slot": "demonBluffs"
+     }
+    ],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 1,
+      "role": "washerwoman",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 2,
+        "role": "librarian"
+       },
+       {
+        "seat": 3,
+        "role": "investigator"
+       },
+       {
+        "seat": 4,
+        "role": "chef"
+       },
+       {
+        "seat": 5,
+        "role": "empath"
+       },
+       {
+        "seat": 6,
+        "role": "fortuneteller"
+       },
+       {
+        "seat": 7,
+        "role": "undertaker"
+       },
+       {
+        "seat": 8,
+        "role": "monk"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 10,
+        "roles": [
+         "washerwoman",
+         "librarian",
+         "investigator",
+         "chef",
+         "empath",
+         "fortuneteller",
+         "undertaker",
+         "monk"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 2,
+      "role": "librarian",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 9,
+        "role": "recluse"
+       },
+       {
+        "seat": "DRUNK_SEAT",
+        "role": "drunk"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 10,
+        "roles": [
+         "butler",
+         "drunk",
+         "recluse",
+         "saint"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 3,
+      "role": "investigator",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 10,
+        "role": "spy"
+       },
+       {
+        "seat": 11,
+        "role": "poisoner"
+       },
+       {
+        "seat": 12,
+        "role": "scarletwoman"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 9,
+        "roles": [
+         "poisoner",
+         "spy",
+         "scarletwoman",
+         "baron"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 4,
+      "role": "chef",
+      "answer": "ALWAYS",
+      "ifDrunk": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      "truthful": [
+       2,
+       3,
+       4
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 5,
+      "role": "empath",
+      "answer": "IF_DRUNK",
+      "ifDrunk": [
+       0,
+       1,
+       2
+      ],
+      "truthful": [
+       0
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 6,
+      "role": "fortuneteller",
+      "answer": "NEVER",
+      "type": "AFTER_PLAYER_CHOICE"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "washerwoman",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "librarian",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "investigator",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "chef",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "empath",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 6,
+      "role": "fortuneteller",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 7,
+      "role": "undertaker",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 8,
+      "role": "monk",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 9,
+      "role": "recluse",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 10,
+      "role": "spy",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 11,
+      "role": "poisoner",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 12,
+      "role": "scarletwoman",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 13,
+      "role": "imp",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": true
+  },
+  {
+   "shown": [
+    "librarian",
+    "chef",
+    "spy",
+    "imp",
+    "soldier",
+    "mayor",
+    "slayer",
+    "virgin",
+    "washerwoman",
+    "butler"
+   ],
+   "expected": {
+    "slots": [
+     {
+      "slot": "drunk",
+      "seats": [
+       1,
+       2,
+       5,
+       6,
+       7,
+       8,
+       9
+      ]
+     },
+     {
+      "roles": [
+       "investigator",
+       "empath",
+       "fortuneteller",
+       "ravenkeeper",
+       "recluse",
+       "saint",
+       "undertaker",
+       "monk"
+      ],
+      "slot": "demonBluffs"
+     }
+    ],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 1,
+      "role": "librarian",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 10,
+        "role": "butler"
+       },
+       {
+        "seat": "DRUNK_SEAT",
+        "role": "drunk"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 3,
+        "roles": [
+         "butler",
+         "drunk",
+         "recluse",
+         "saint"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 2,
+      "role": "chef",
+      "answer": "ALWAYS",
+      "ifDrunk": [
+       0,
+       1,
+       2,
+       3
+      ],
+      "truthful": [
+       0,
+       1
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 9,
+      "role": "washerwoman",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 1,
+        "role": "librarian"
+       },
+       {
+        "seat": 2,
+        "role": "chef"
+       },
+       {
+        "seat": 5,
+        "role": "soldier"
+       },
+       {
+        "seat": 6,
+        "role": "mayor"
+       },
+       {
+        "seat": 7,
+        "role": "slayer"
+       },
+       {
+        "seat": 8,
+        "role": "virgin"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 3,
+        "roles": [
+         "librarian",
+         "chef",
+         "soldier",
+         "mayor",
+         "slayer",
+         "virgin",
+         "washerwoman"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "librarian",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "chef",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "spy",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "imp",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "soldier",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 6,
+      "role": "mayor",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 7,
+      "role": "slayer",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 8,
+      "role": "virgin",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 9,
+      "role": "washerwoman",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 10,
+      "role": "butler",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": true
+  },
+  {
+   "shown": [
+    "librarian",
+    "empath",
+    "spy",
+    "saint",
+    "fortuneteller",
+    "imp",
+    "recluse"
+   ],
+   "expected": {
+    "slots": [
+     {
+      "slot": "drunk",
+      "seats": [
+       1,
+       2,
+       5
+      ]
+     },
+     {
+      "slot": "redHerring",
+      "seats": [
+       1,
+       2,
+       4,
+       5
+      ]
+     },
+     {
+      "roles": [
+       "washerwoman",
+       "investigator",
+       "chef",
+       "ravenkeeper",
+       "soldier",
+       "mayor",
+       "butler",
+       "undertaker",
+       "monk",
+       "virgin",
+       "slayer"
+      ],
+      "slot": "demonBluffs"
+     }
+    ],
+    "schemaId": "botc.initial-joint-opening-request-v3",
+    "firstNightInfo": [
+     {
+      "seat": 1,
+      "role": "librarian",
+      "answer": "ALWAYS",
+      "truthful": [
+       {
+        "seat": 4,
+        "role": "saint"
+       },
+       {
+        "seat": 7,
+        "role": "recluse"
+       },
+       {
+        "seat": "DRUNK_SEAT",
+        "role": "drunk"
+       }
+      ],
+      "mayRegister": [
+       {
+        "seat": 3,
+        "roles": [
+         "butler",
+         "drunk",
+         "recluse",
+         "saint"
+        ]
+       }
+      ],
+      "type": "PAIR"
+     },
+     {
+      "seat": 2,
+      "role": "empath",
+      "answer": "ALWAYS",
+      "ifDrunk": [
+       0,
+       1,
+       2
+      ],
+      "truthful": [
+       0,
+       1
+      ],
+      "type": "NUMBER"
+     },
+     {
+      "seat": 5,
+      "role": "fortuneteller",
+      "answer": "NEVER",
+      "type": "AFTER_PLAYER_CHOICE"
+     }
+    ],
+    "seats": [
+     {
+      "seat": 1,
+      "role": "librarian",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 2,
+      "role": "empath",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 3,
+      "role": "spy",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 4,
+      "role": "saint",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 5,
+      "role": "fortuneteller",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 6,
+      "role": "imp",
+      "experience": "BEGINNER"
+     },
+     {
+      "seat": 7,
+      "role": "recluse",
+      "experience": "BEGINNER"
+     }
+    ],
+    "script": "trouble_brewing"
+   },
+   "hasDrunk": true
+  }
+ ]
+}
