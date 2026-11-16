@@ -4,4 +4,4 @@ declare namespace Cloudflare {
     BUCKET?: R2Bucket;
   }
 }
-declare namespace Cloudflare { interface Env { OPENAI_API_KEY?:string; } }
+declare namespace Cloudflare { interface Env { OPENAI_API_KEY?:string; ACCESS_TEAM_DOMAIN?:string; ACCESS_AUD?:string; } }

@@ -15,8 +15,12 @@ const { d1, r2 } = hostingConfig;
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const managedLinux = readExecutionProfile() === "managed-linux";
 
+// PROMPT_LAB_TARGET=cloudflare builds the self-hosted Cloudflare entry, which
+// wraps the app in the Cloudflare Access gate (scripts/deploy-cloudflare.mjs).
+const cloudflareTarget = process.env.PROMPT_LAB_TARGET === "cloudflare";
+
 const localBindingConfig = {
-  main: "./worker/index.ts",
+  main: cloudflareTarget ? "./worker/cloudflare.ts" : "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
   d1_databases: d1
     ? [

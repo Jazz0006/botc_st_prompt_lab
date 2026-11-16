@@ -89,3 +89,13 @@ APP基线来自 `Jazz0006/CampBoardGameHost` 的 `bc11573236866be8f649d6b26d6606
 选择 APP 模板后，在方桌上点选两个角色交换完整座位配置；支持随机排列、撤销排座和恢复默认。顺时针编号，最后一号与一号相邻。应用前不改请求正文，尚未应用的排列不能保存或发送；应用时明确确认替换局面 JSON，重新生成信息来源、事件标识与阵容指纹，并保留替换前文本以便撤销。固定说明、任务、输出要求和历史版本保持原样。
 
 局面 JSON 默认折叠，日常编辑聚焦固定说明。后续请求基线及逐夜演练入口已收起；历史数据与原始基线资料保留，不新增游戏推进或事件引擎。
+
+## 自建 Cloudflare 部署（可选）
+
+与上面的 Sites 站点相互独立，部署到自己的 Cloudflare 账户，并由 Cloudflare Access 负责登录：
+
+- 入口 `worker/cloudflare.ts` 用 `worker/cloudflare-access.ts` 包住原应用：每个请求必须带有效的 Access 签名令牌（团队域名与 AUD 均匹配），否则拒绝；未配置 Access 时全部拒绝。Sites 构建仍使用 `worker/index.ts`，不受影响。
+- 非密钥设置在 `deploy/cloudflare.json`（Worker 名称、D1 数据库、Access 团队域名与 AUD）。
+- `node scripts/deploy-cloudflare.mjs migrate deploy`：以 `PROMPT_LAB_TARGET=cloudflare` 构建，按 `drizzle/` 应用远程 D1 迁移（已应用的不会重复），然后部署。需要环境变量 `CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`。
+- GitHub Actions `Deploy to Cloudflare` 执行同样步骤，需要仓库密钥 `CLOUDFLARE_API_TOKEN`。
+- 自建站点的数据库从空开始；Sites 站点上的记录需用站内备份／导出另行迁移。

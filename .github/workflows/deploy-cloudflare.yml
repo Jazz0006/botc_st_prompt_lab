@@ -1,0 +1,39 @@
+name: Deploy to Cloudflare
+
+# Self-hosted Cloudflare copy of the Prompt Lab, behind Cloudflare Access.
+# The OpenAI Sites site is deployed separately and is not affected.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, claude/cloudflare-deploy]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: 4977b30b3411922bc239e705cfce3de3
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Check secret
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Add the CLOUDFLARE_API_TOKEN repository secret first."
+            exit 1
+          fi
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec tsc --noEmit
+      - run: node scripts/verify-lab.cjs && node scripts/verify-lab-transport.cjs
+      - run: node scripts/deploy-cloudflare.mjs migrate deploy
